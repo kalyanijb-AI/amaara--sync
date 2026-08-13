@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       category:
-        description: 'Single category to sync (leave empty for all)'
+        description: 'Single category to sync (leave empty for all, or __debug__ for collar diagnostics)'
         required: false
         default: ''
       dry_run:
@@ -53,7 +53,9 @@ jobs:
           SYNC_CATEGORY: ${{ github.event.inputs.category }}
           DRY_RUN:       ${{ github.event.inputs.dry_run }}
         run: |
-          if [ -n "$SYNC_CATEGORY" ]; then
+          if [ "$SYNC_CATEGORY" = "__debug__" ]; then
+            python debug_collar.py
+          elif [ -n "$SYNC_CATEGORY" ]; then
             python sync.py $SYNC_CATEGORY
           else
             python sync.py
