@@ -251,7 +251,10 @@ def main():
 
         # Save state after each collection (resilient to interruption)
         st["last_run"] = run_start.isoformat()
-        state.save(st)
+        if shopify.DRY_RUN:
+            print("  [DRY RUN] Skipping state.json write")
+        else:
+            state.save(st)
 
     # Final summary
     elapsed = (datetime.now(timezone.utc) - run_start).seconds // 60
