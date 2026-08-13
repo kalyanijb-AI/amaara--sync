@@ -1,8 +1,10 @@
 """
 shopify.py — Shopify API helpers
 """
-import requests, time, re
+import os, requests, time, re
 from config import SHOPIFY_API, SHOPIFY_HEADERS, API_DELAY
+
+DRY_RUN = os.environ.get("DRY_RUN", "false").strip().lower() in ("true", "1", "yes")
 
 # ── Core request with retry ───────────────────────────────────────────────────
 def api(method, endpoint, payload=None, params=None):
@@ -31,6 +33,9 @@ def get_or_create_collection(title, sort_order="created-desc"):
         cols = r.json().get("custom_collections", [])
         if cols:
             return cols[0]["id"]
+    if DRY_RUN:
+        print(f"    [DRY RUN] Would create collection: {title}", flush=True)
+        return -1
     r = api("post", "custom_collections.json", {
         "custom_collection": {
             "title": title,
@@ -101,17 +106,26 @@ def get_collects(col_id):
 
 # ── Add product to collection ─────────────────────────────────────────────────
 def add_to_collection(product_id, col_id):
+    if DRY_RUN:
+        print(f"    [DRY RUN] Would add product {product_id} to collection {col_id}", flush=True)
+        return True
     r = api("post", "collects.json",
             {"collect": {"product_id": product_id, "collection_id": col_id}})
     return r and r.status_code in (200, 201)
 
 # ── Remove product from collection (by collect_id) ────────────────────────────
 def remove_from_collection(collect_id):
+    if DRY_RUN:
+        print(f"    [DRY RUN] Would remove collect {collect_id}", flush=True)
+        return True
     r = api("delete", f"collects/{collect_id}.json")
     return r and r.status_code == 200
 
 # ── Create a product ─────────────────────────────────────────────────────────
 def create_product(payload):
+    if DRY_RUN:
+        print(f"    [DRY RUN] Would create product: {payload.get('title', '?')}", flush=True)
+        return {"id": -1, "title": payload.get("title", "?")}
     r = api("post", "products.json", {"product": payload})
     if r and r.status_code == 201:
         return r.json()["product"]
@@ -119,6 +133,10 @@ def create_product(payload):
 
 # ── Update a product variant ─────────────────────────────────────────────────
 def update_variant(variant_id, price=None, sku=None, inventory_quantity=None):
+    if DRY_RUN:
+        print(f"    [DRY RUN] Would update variant {variant_id} "
+              f"(price={price}, sku={sku}, inventory_quantity={inventory_quantity})", flush=True)
+        return True
     body = {"variant": {"id": variant_id}}
     if price is not None:
         body["variant"]["price"] = str(price)
@@ -131,12 +149,18 @@ def update_variant(variant_id, price=None, sku=None, inventory_quantity=None):
 
 # ── Update product title / status ────────────────────────────────────────────
 def update_product(product_id, **kwargs):
+    if DRY_RUN:
+        print(f"    [DRY RUN] Would update product {product_id}: {kwargs}", flush=True)
+        return True
     body = {"product": {"id": product_id, **kwargs}}
     r = api("put", f"products/{product_id}.json", body)
     return r and r.ok
 
 # ── Add image to product ─────────────────────────────────────────────────────
 def add_image(product_id, src, alt=""):
+    if DRY_RUN:
+        print(f"    [DRY RUN] Would add image to product {product_id}: {src}", flush=True)
+        return True
     r = api("post", f"products/{product_id}/images.json",
             {"image": {"src": src, "alt": alt}})
     return r and r.status_code in (200, 201)
