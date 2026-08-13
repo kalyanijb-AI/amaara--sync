@@ -2,12 +2,8 @@ name: Amaara Inventory Sync
 
 on:
   schedule:
-    # Every Monday at 2am UTC  -> full sync + archive New Collections
+    # Weekly full sync - every Monday at 2am UTC
     - cron: '0 2 * * 1'
-    # Every Wednesday at 2am UTC
-    - cron: '0 2 * * 3'
-    # Every Friday at 2am UTC
-    - cron: '0 2 * * 5'
   workflow_dispatch:
     inputs:
       category:
