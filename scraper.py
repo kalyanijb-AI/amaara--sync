@@ -80,11 +80,18 @@ def scrape_category(slugs):
     for slug in slugs:
         print(f"    Scraping /{slug}...", flush=True)
         empty = 0
+        errors = 0
         for page in range(1, MAX_PAGES + 1):
             result = scrape_page(slug, page)
-            if result is None:  # error
-                time.sleep(2)
+            if result is None:  # error/timeout
+                errors += 1
+                print(f"    p{page}: error/timeout ({errors} consecutive)", flush=True)
+                if errors >= 3:
+                    print(f"    ⚠ Giving up on /{slug} after {errors} consecutive errors", flush=True)
+                    break
+                time.sleep(5)
                 continue
+            errors = 0
             if not result:      # empty page
                 empty += 1
                 if empty >= 2:
