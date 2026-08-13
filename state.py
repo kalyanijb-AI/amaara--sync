@@ -36,6 +36,27 @@ def save(state):
         json.dump(state, f, indent=2)
     print(f"  State saved to {STATE_FILE}")
 
+def commit_and_push(message):
+    """Commit state.json to git and push, so progress survives a crash/timeout.
+    Safe to call repeatedly — no-ops if there's nothing staged to commit."""
+    import subprocess
+    try:
+        subprocess.run(["git", "config", "user.name", "Amaara Sync Bot"], check=False)
+        subprocess.run(["git", "config", "user.email", "sync@amaaraworld.com"], check=False)
+        subprocess.run(["git", "add", STATE_FILE], check=False)
+        diff = subprocess.run(["git", "diff", "--staged", "--quiet"])
+        if diff.returncode == 0:
+            print("  No state changes to commit")
+            return
+        subprocess.run(["git", "commit", "-m", message], check=False)
+        push = subprocess.run(["git", "push"], capture_output=True, text=True)
+        if push.returncode != 0:
+            print(f"  Warning: git push failed: {push.stderr.strip()}")
+        else:
+            print(f"  ✓ Committed and pushed: {message}")
+    except Exception as e:
+        print(f"  Warning: commit_and_push failed: {e}")
+
 def is_monday():
     return datetime.now(timezone.utc).weekday() == 0
 
