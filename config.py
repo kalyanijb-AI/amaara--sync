@@ -5,7 +5,7 @@ All environment variables are injected by GitHub Actions secrets.
 import os
 
 # ── Shopify ───────────────────────────────────────────────────────────────────
-SHOPIFY_STORE = os.environ.get("SHOPIFY_STORE", "amaaraworld.myshopify.com")
+SHOPIFY_STORE = os.environ.get("SHOPIFY_STORE") or "amaaraworld.myshopify.com"
 SHOPIFY_TOKEN = os.environ.get("SHOPIFY_TOKEN")
 if not SHOPIFY_TOKEN:
     raise RuntimeError("SHOPIFY_TOKEN environment variable is not set")
