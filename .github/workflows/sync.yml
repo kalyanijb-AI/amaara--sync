@@ -38,6 +38,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Restore state cache
+        if: github.event.inputs.dry_run != 'true'
         uses: actions/cache@v4
         with:
           path: state.json
@@ -59,14 +60,14 @@ jobs:
           fi
 
       - name: Save state
-        if: always()
+        if: always() && github.event.inputs.dry_run != 'true'
         uses: actions/cache@v4
         with:
           path: state.json
           key: amaara-state-${{ github.run_number }}
 
       - name: Commit sync state
-        if: always()
+        if: always() && github.event.inputs.dry_run != 'true'
         run: |
           git config user.name  "Amaara Sync Bot"
           git config user.email "sync@amaaraworld.com"
