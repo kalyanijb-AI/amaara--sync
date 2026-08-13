@@ -236,6 +236,13 @@ def main():
 
     # Sync each collection in order
     order = st.get("collection_run_order", list(config.COLLECTIONS.keys()))
+    if len(sys.argv) > 1 and sys.argv[1].strip():
+        requested = sys.argv[1].strip().lower()
+        if requested in config.COLLECTIONS:
+            order = [requested]
+            print(f"  Running single category: {requested}")
+        else:
+            print(f"  ⚠ Unknown category '{requested}' — running full order instead")
     total = {"created": 0, "updated": 0, "retired": 0, "errors": 0}
 
     for cat_key in order:
