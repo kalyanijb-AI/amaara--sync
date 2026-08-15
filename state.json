@@ -1,10 +1,54 @@
 {
-  "last_run": null,
+  "last_run": "2026-08-15T20:48:28.824241+00:00",
   "last_monday_run": null,
-  "new_collections_id": null,
-  "new_collections_date": null,
-  "new_products_this_week": [],
-  "out_of_stock_id": null,
-  "collection_run_order": ["choker","classic","collar","traditional","earrings","bracelets","pendants","rings"],
-  "last_sync_stats": {}
+  "new_collections_id": 508654616876,
+  "new_collections_date": "2026-08-15",
+  "new_products_this_week": [
+    10429379150124,
+    10429379182892,
+    10429379248428,
+    10429379281196,
+    10429379313964,
+    10429379379500,
+    10429379412268,
+    10429379477804,
+    10429379543340,
+    10429379608876,
+    10429379641644,
+    10429379674412,
+    10429379739948,
+    10429379805484,
+    10429379871020,
+    10429379903788,
+    10429379969324,
+    10429464150316,
+    10429464183084,
+    10429464215852,
+    10429464281388
+  ],
+  "out_of_stock_id": 508969124140,
+  "collection_run_order": [
+    "choker",
+    "classic",
+    "collar",
+    "traditional",
+    "earrings",
+    "bracelets",
+    "pendants",
+    "rings"
+  ],
+  "last_sync_stats": {
+    "collar": {
+      "created": 63,
+      "updated": 0,
+      "retired": 59,
+      "errors": 1
+    },
+    "choker": {
+      "created": 11,
+      "updated": 6,
+      "retired": 11,
+      "errors": 1
+    }
+  }
 }
