@@ -18,7 +18,8 @@ on:
 
 permissions:
   contents: write
-  jobs:
+
+jobs:
   sync:
     name: Inventory Sync
     runs-on: ubuntu-latest
