@@ -23,7 +23,7 @@ jobs:
   sync:
     name: Inventory Sync
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 480
 
     steps:
       - name: Checkout
