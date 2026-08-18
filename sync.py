@@ -129,21 +129,21 @@ def sync_collection(cat_key, st):
         if prod:
             pid = prod["id"]
             new_pids.append(pid)
-                # Link each variant to its matching image so the storefront
-                # switches photos correctly when a variant is selected
-                if len(group_prods) > 1:
-                    prod_variants = prod.get("variants", [])
-                    prod_images = prod.get("images", [])
-                    for vi, variant in enumerate(prod_variants):
-                        if vi < len(prod_images):
-                            shopify.update_variant_image(variant["id"], prod_images[vi]["id"])
-            # Add to category collection
-            shopify.add_to_collection(pid, col_id)
-            # Add to New Collections
+            # Link each variant to its matching image so the storefront
+            # switches photos correctly when a variant is selected
+            if len(group_prods) > 1:
+                prod_variants = prod.get("variants", [])
+                prod_images = prod.get("images", [])
+                for vi, variant in enumerate(prod_variants):
+                    if vi < len(prod_images):
+                        shopify.update_variant_image(variant["id"], prod_images[vi]["id"])
+        # Add to category collection
+        shopify.add_to_collection(pid, col_id)
+        # Add to New Collections
             if nc_id:
-                shopify.add_to_collection(pid, nc_id)
+            shopify.add_to_collection(pid, nc_id)
                 st.setdefault("new_products_this_week", []).append(pid)
-            created += len(group_prods)
+        created += len(group_prods)
             if created <= 10 or created % 100 == 0:
                 name = group_prods[0]["name"]
                 print(f"    [{created}] {name[:50]} (${group_prods[0]['price']})", flush=True)
