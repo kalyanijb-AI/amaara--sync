@@ -156,6 +156,15 @@ def update_product(product_id, **kwargs):
     r = api("put", f"products/{product_id}.json", body)
     return r and r.ok
 
+# ── Link a variant to a specific image ───────────────────────────────────────
+def update_variant_image(variant_id, image_id):
+    if DRY_RUN:
+        print(f"    [DRY RUN] Would link variant {variant_id} to image {image_id}", flush=True)
+        return True
+    r = api("put", f"variants/{variant_id}.json",
+            {"variant": {"id": variant_id, "image_id": image_id}})
+    return r and r.ok
+
 # ── Add image to product ─────────────────────────────────────────────────────
 def add_image(product_id, src, alt=""):
     if DRY_RUN:
