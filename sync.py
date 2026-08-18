@@ -14,7 +14,7 @@ Logic:
      (minus last 2 digits) are grouped as one listing with multiple options.
 """
 
-import sys, time
+import sys, timePage_DownPage_DownPage_DownPage_DownPage_Down
 from datetime import datetime, timezone
 from collections import defaultdict
 
@@ -129,6 +129,14 @@ def sync_collection(cat_key, st):
         if prod:
             pid = prod["id"]
             new_pids.append(pid)
+                # Link each variant to its matching image so the storefront
+                # switches photos correctly when a variant is selected
+                if len(group_prods) > 1:
+                    prod_variants = prod.get("variants", [])
+                    prod_images = prod.get("images", [])
+                    for vi, variant in enumerate(prod_variants):
+                        if vi < len(prod_images):
+                            shopify.update_variant_image(variant["id"], prod_images[vi]["id"])
             # Add to category collection
             shopify.add_to_collection(pid, col_id)
             # Add to New Collections
