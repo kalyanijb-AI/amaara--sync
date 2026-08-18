@@ -14,7 +14,7 @@ Logic:
      (minus last 2 digits) are grouped as one listing with multiple options.
 """
 
-import sys, timePage_DownPage_DownPage_DownPage_DownPage_Down
+import sys, time
 from datetime import datetime, timezone
 from collections import defaultdict
 
