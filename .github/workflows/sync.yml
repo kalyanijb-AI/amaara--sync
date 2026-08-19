@@ -141,6 +141,96 @@ jobs:
           SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
           SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
           SYNC_CATEGORY: ${{ github.event.inputs.category }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          if [ "$SYNC_CATEGORY" = "__debug__" ]; then
+            python debug_collar.py
+          elif [[ "$SYNC_CATEGORY" == __backfill_* ]]; then
+            python backfill_variant_images.py "${SYNC_CATEGORY#__backfill_}"
+          elif [ -n "$SYNC_CATEGORY" ]; then
+            python sync.py $SYNC_CATEGORY
+          else
+            python sync.py
+          fi
+
+      - name: Save state
+        if: always() && github.event.inputs.dry_run != 'true'
+        uses: actions/cache@v4
+        with:
+          path: state.json
+          key: amaara-state-${{ github.run_number }}
+
+      - name: Commit sync state
+        if: always() && github.event.inputs.dry_run != 'true'
+        run: |
+          git config user.name "Amaara Sync Bot"
+          git config user.email "sync@amaaraworld.com"
+          git add state.json
+          git diff --staged --quiet || git commit -m "chore: sync state $(date -u +%Y-%m-%d)"
+          git push || echo "Nothing to push"
+
+      - name: Upload sync log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-log-${{ github.run_number }}
+          path: |
+            state.json
+            *.log
+          retention-days: 30
+name: Amaara Inventory Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      category:
+        description: 'Single category to sync (leave empty for all, or __debug__ for collar diagnostics)'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Dry run (scrape only, no Shopify writes)'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: Inventory Sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 480
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore state cache
+        if: github.event.inputs.dry_run != 'true'
+        uses: actions/cache@v4
+        with:
+          path: state.json
+          key: amaara-state-${{ github.run_number }}
+          restore-keys: |
+            amaara-state-
+
+      - name: Run inventory sync
+        env:
+          SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+          SYNC_CATEGORY: ${{ github.event.inputs.category }}
           DRY_RUN:       ${{ github.event.inputs.dry_run }}
         run: |
           if [ "$SYNC_CATEGORY" = "__debug__" ]; then
